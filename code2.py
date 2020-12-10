@@ -1,7 +1,6 @@
 import os
 import json
 import time
-import portalocker
 import threading
 dic = {}
 time_stamp = {} 
@@ -18,26 +17,22 @@ class CRD:
         if file.__sizeof__() > (1024**3):
             raise Exception("Size exceeded")
         if(key.isalpha()):
-            with portalocker.Lock(key,'w') as f:
-                
+            with open(key,'w') as f:
                 dic[key]=value
                 f.write(json.dumps(dic))
                 if TIME == 0:
                     time_stamp[key] = TIME
                 else:
                     time_stamp[key] = int(time.time()) + TIME 
-           
-            
         else:
             print("Enter a vaild key that contain only string\n")
-        print("Details recorded successfully")
             
                     
     def read(self):
         key=input('Enter the key to search : ')
         read_data = time_stamp[key]
         if (os.path.isfile(key)):
-            with portalocker.Lock(key,'r') as f:
+            with open(key,'r') as f:
                 if(read_data!=0):
                     if int(time.time()) < int(read_data):
                         set_value = 0
@@ -47,22 +42,26 @@ class CRD:
                                 set_value = 1
                         if(set_value==0):
                             print("Key not found\n")
-                        print("Key found\n")
+                        print("Key found")
                         print(json.loads(f.readline()))
-                        
                     else:
                         print("Time-To-Live property of--" , key , "--has expired \n")
                 else:
                     set_value = 0
                     for i in dic:
                         if key==i:
-                            print('{',i,':',dic[i],'}')
+                            print("-----------------------")
+                            print("|Key    |Value")
+                            print("-----------------------")
+                            user_dic = {}
+                            user_dic[i] = int(dic[i])
+                            print(user_dic)
+                            user_dic.clear()
                             set_value = 1
                     if(set_value==0):
-                        print("Key not found")
+                        print("key not found")
                     print("Key found")
-                    print(json.loads(f.readline())) # to show the pairs in the file
-                    
+                    print(json.loads(f.readline()))
         else:
             print("File not found")
                     
@@ -82,21 +81,17 @@ class CRD:
                     print("Time-To-Live property of" , key , "has expired ")
             else:
                 os.remove(key)
-
-
 if __name__ == '__main__':
     d = CRD()
     try:
             path = input('Enter the path to store the data : \n')
-            os.mkdir(os.path.join(path,'datastore'))
-            path = path+'\datastore'
+            os.mkdir(os.path.join(path,'data1'))
+            path = path+'\data1'
             os.chdir(path)
-            
-            
     except:
-        path = r"C:\Users\data\Desktop\a"
-        os.mkdir(os.path.join(path,'datastore'))
-        path=path+'\datastore'
+        path = r"C:\Users\srinivasan\Desktop\a"
+        os.mkdir(os.path.join(path,'data1'))
+        path=path+'\data1'
         os.chdir(path)
     n = 1
     while(True):
